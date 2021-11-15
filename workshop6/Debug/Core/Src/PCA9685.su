@@ -1,0 +1,5 @@
+PCA9685.c:5:6:sleep_mode_on	32	static
+PCA9685.c:12:6:sleep_mode_off	32	static
+PCA9685.c:19:6:enable_outputs	32	static
+PCA9685.c:26:6:disable_outputs	32	static
+PCA9685.c:33:6:set_PWM_frequency	32	static
