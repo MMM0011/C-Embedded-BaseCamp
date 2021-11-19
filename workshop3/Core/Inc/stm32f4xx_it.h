@@ -62,6 +62,7 @@ void EXTI15_10_IRQHandler(void);
 
 	uint8_t get_pin_number( void );
 	uint16_t get_psc( void );
+	uint16_t get_arr( void );
 
 /* USER CODE END EFP */
 

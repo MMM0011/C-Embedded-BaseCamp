@@ -56,16 +56,10 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+uint8_t get_pin_number( void );
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define UP_CYCLE_Pin GPIO_PIN_9
-#define UP_CYCLE_GPIO_Port GPIOC
-#define UP_CYCLE_EXTI_IRQn EXTI9_5_IRQn
-#define DOWN_CYCLE_Pin GPIO_PIN_11
-#define DOWN_CYCLE_GPIO_Port GPIOC
-#define DOWN_CYCLE_EXTI_IRQn EXTI15_10_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

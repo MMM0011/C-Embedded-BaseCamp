@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stm32f4xx_it.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,12 +92,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
  // HAL_TIM_Base_Start_IT(&htim4);
- HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+ //HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
 
 
 
  unsigned int channels [ 4 ] = { TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4  };
- uint8_t pin = 0;
+ uint8_t pin_now = 1;
+ uint8_t pin_was;
 
   /* USER CODE END 2 */
 
@@ -106,19 +107,26 @@ int main(void)
   while (1)
   {
 
-	 pin = get_pin_number();
-	 TIM4->PSC = get_psc();
+	TIM4->PSC = get_psc();
 
-	 if( pin !=4 )
-	 {
-		  HAL_TIM_PWM_Start ( &htim4, channels[ pin ] );
-		  if( pin != 0 )
-		  HAL_TIM_PWM_Stop ( &htim4, channels[ pin - 1 ] );
-	 }
-	 else
-	 {
-		 HAL_TIM_PWM_Stop ( &htim4, channels[ pin - 1 ] );
-	 }
+	TIM4->ARR = get_arr();
+
+
+	  pin_was = pin_now;
+	  pin_now = get_pin_number();
+
+	  if( pin_now != pin_was )
+	  {
+		  HAL_TIM_PWM_Stop ( &htim4, channels[ pin_was ] );
+		  if( pin_now != 4 )
+			  HAL_TIM_PWM_Start ( &htim4, channels[ pin_now ] );
+	  }
+
+
+
+
+
+
 
 
 
@@ -192,7 +200,7 @@ static void MX_TIM4_Init(void)
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim4.Init.Period = 2000;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
   {
     Error_Handler();
@@ -259,8 +267,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : UP_CYCLE_Pin DOWN_CYCLE_Pin */
-  GPIO_InitStruct.Pin = UP_CYCLE_Pin|DOWN_CYCLE_Pin;
+  /*Configure GPIO pins : PC9 PC11 */
+  GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_11;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);

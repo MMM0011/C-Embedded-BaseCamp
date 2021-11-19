@@ -46,9 +46,12 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
-	uint16_t ccr;
-	uint16_t psc = 1600;
+	uint8_t Hz = 1;
+	uint8_t duty_cycleP = 5;
+	uint16_t arr = 2000;
+	uint16_t psc = 8000;
 	uint8_t pin_n = 0;
+	const uint32_t m16 = 16000000;
 
 /* USER CODE END PV */
 
@@ -71,14 +74,52 @@
 		return pin_n;
 	}
 
-	uint16_t get_ccr( void )
+	uint16_t get_arr( void )
 	{
-		return ccr;
+		return arr;
 	}
 
 	uint16_t get_psc( void )
 	{
 		return psc;
+	}
+
+	static void duty_cycle_UP( void )
+	{
+		if( duty_cycleP  == 95 )
+			return;
+
+		duty_cycleP += 5;
+		arr = 100 / duty_cycleP * 100;
+	}
+
+	static void duty_cycle_DOWN( void )
+	{
+		if( duty_cycleP  == 5 )
+			return;
+
+		duty_cycleP -= 5;
+		arr = 100 / duty_cycleP * 100;
+	}
+
+	static void frequency_UP( void )
+	{
+		if( Hz  == 10 )
+			return;
+
+		Hz += 1;
+		uint8_t i = arr / Hz;
+		psc =  m16 / i;
+	}
+
+	static void frequency_DOWN( void )
+	{
+		if( Hz  == 1 )
+			return;
+
+		Hz -= 1;
+		uint8_t i = arr / Hz;
+		psc =  m16 / i;
 	}
 
 /* USER CODE END EV */
@@ -228,29 +269,19 @@ void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
 
-			if( !HAL_GPIO_ReadPin(GPIOC, UP_CYCLE_Pin) )
+			if( !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9) )
 			{
-				if( ccr == 500)
-				{
-
-				}
-				else
-					TIM4->CCR1 = TIM4->CCR2 = TIM4->CCR3 = TIM4->CCR4 += 25;
+				duty_cycle_UP();
 			}
 
 			if( !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6) )
 			{
-				if( TIM4->PSC == 20 * 1600 ){ }
-				else
-					TIM4->PSC += 1600;
+				frequency_UP();
 			}
-
 
 			if( !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_8) )
 			{
-				if( TIM4->PSC == 1600 ){ }
-				else
-					TIM4->PSC -= 1600;
+				frequency_DOWN();
 			}
 
 
@@ -270,14 +301,9 @@ void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 
-	if( !HAL_GPIO_ReadPin(GPIOC, DOWN_CYCLE_Pin) )
+	if( !HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11) )
 	{
-		if( ccr == 50)
-		{
-
-		}
-		else
-			TIM4->CCR1 = TIM4->CCR2 = TIM4->CCR3 = TIM4->CCR4 -= 24;
+		duty_cycle_DOWN();
 	}
 
 	if( !HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) )
